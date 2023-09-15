@@ -68,6 +68,9 @@ export class RedisCrawlState
     this.fkey = this.key + ":f";
     // crawler errors
     this.ekey = this.key + ":e";
+    // start and end times to compute execution minutes
+    this.startkey = this.key + ":start";
+    this.endkey = this.key + ":end";
 
     this._initLuaCommands(this.redis);
   }
@@ -181,6 +184,16 @@ return 0;
 
   _timestamp() {
     return new Date().toISOString();
+  }
+
+  async setStartTime() {
+    const startTime = this._timestamp();
+    return await this.redis.rpush(this.startkey, startTime);
+  }
+
+  async setEndTime() {
+    const endTime = this._timestamp();
+    return await this.redis.rpush(this.endkey, endTime);
   }
 
   async markStarted(url) {
