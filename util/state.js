@@ -188,12 +188,12 @@ return 0;
 
   async setStartTime() {
     const startTime = this._timestamp();
-    return await this.redis.rpush(this.startkey, startTime);
+    return await this.redis.rpush(`${this.startkey}:${this.uid}`, startTime);
   }
 
   async setEndTime() {
     const endTime = this._timestamp();
-    return await this.redis.rpush(this.endkey, endTime);
+    return await this.redis.rpush(`${this.endkey}:${this.uid}`, endTime);
   }
 
   async markStarted(url) {
