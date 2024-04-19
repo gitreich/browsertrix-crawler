@@ -42,3 +42,11 @@ When using Browsertrix Crawler in production, it is recommended to use a specifi
 All released Docker Images are available from [Docker Hub, listed by release tag here](https://hub.docker.com/r/webrecorder/browsertrix-crawler/tags?page=1&ordering=last_updated).
 
 Details for each corresponding release tag are also available on GitHub under [Releases](https://github.com/webrecorder/browsertrix-crawler/releases).
+
+## Docker Exit Codes
+| ExitCode    | Description |
+| -------- | ------- |
+| 0  | Success |
+| 1  | Application Crash |
+| 9  | Timeout |
+| 11  | Crawl interrupted by SizeLimit or TimeLimit |
