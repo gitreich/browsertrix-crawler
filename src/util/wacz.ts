@@ -74,12 +74,12 @@ class CurrZipFileMarker extends Uint8Array {
   size: number;
   hasher: Hash;
 
-  constructor(filename: string, zipPath: string, size: number) {
+  constructor(filename: string, zipPath: string, size: number, hashAlgorithm: string = "sha256") {
     super();
     this.filename = filename;
     this.zipPath = zipPath;
     this.size = size;
-    this.hasher = createHash("sha256");
+    this.hasher = createHash(hashAlgorithm);
   }
 }
 
@@ -145,7 +145,7 @@ export class WACZ {
       this.iterDirForZip(files),
     ) as ReadableStream<Uint8Array>;
 
-    const hasher = createHash("sha256");
+    const hasher = createHash(this.cdxHash.algorithm);
     const resources = this.datapackage.resources;
 
     let size = 0;
@@ -162,7 +162,7 @@ export class WACZ {
             const name = basename(currFile.filename).toLowerCase();
             const path = currFile.zipPath;
             const bytes = currFile.size;
-            const hash = "sha256:" + currFile.hasher.digest("hex");
+            const hash = `${wacz.cdxHash.algorithm}:${currFile.hasher.digest(wacz.cdxHash.encoding)}`; 
             resources.push({ name, path, bytes, hash });
             logger.debug("Added file to WACZ", { path, bytes, hash }, "wacz");
           }
@@ -177,7 +177,7 @@ export class WACZ {
         }
       }
 
-      wacz.hash = hasher.digest("hex");
+      wacz.hash = hasher.digest(wacz.cdxHash.encoding); 
       wacz.size = size;
     }
 
@@ -223,8 +223,8 @@ export class WACZ {
       const nameStr = filename.slice(this.collDir.length + 1);
       const name = encoder.encode(nameStr);
 
-      const currFile = new CurrZipFileMarker(filename, nameStr, size);
-
+      const currFile = new CurrZipFileMarker(filename, nameStr, size, this.cdxHash.algorithm); 
+      
       yield { input: wrapMarkers(currFile, input), lastModified, name, size };
     }
 
@@ -242,7 +242,7 @@ export class WACZ {
     };
 
     const hash =
-      "sha256:" + createHash("sha256").update(datapackageData).digest("hex");
+      `${this.cdxHash.algorithm}:${createHash(this.cdxHash.algorithm).update(datapackageData).digest(this.cdxHash.encoding)}`; 
 
     // datapackage-digest.json
 
